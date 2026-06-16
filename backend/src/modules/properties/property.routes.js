@@ -1,7 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const propertyController = require('./property.controller')
-const authenticate = require('../../middleware/auth')
+const express = require("express");
+const router = express.Router();
+const propertyController = require("./property.controller");
+const authenticate = require("../../middleware/auth");
 
 /**
  * @swagger
@@ -60,7 +60,7 @@ const authenticate = require('../../middleware/auth')
  *       200:
  *         description: List of properties
  */
-router.get('/', getAllPropertiesHandler)
+router.get("/", getAllPropertiesHandler);
 
 /**
  * @swagger
@@ -113,7 +113,7 @@ router.get('/', getAllPropertiesHandler)
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authenticate, propertyController.createProperty)
+router.post("/", authenticate, propertyController.createProperty);
 
 /**
  * @swagger
@@ -133,7 +133,7 @@ router.post('/', authenticate, propertyController.createProperty)
  *       404:
  *         description: Property not found
  */
-router.get('/:id', propertyController.getPropertyById)
+router.get("/:id", propertyController.getPropertyById);
 
 /**
  * @swagger
@@ -155,7 +155,7 @@ router.get('/:id', propertyController.getPropertyById)
  *       403:
  *         description: Unauthorized
  */
-router.put('/:id', authenticate, propertyController.updateProperty)
+router.put("/:id", authenticate, propertyController.updateProperty);
 
 /**
  * @swagger
@@ -177,7 +177,7 @@ router.put('/:id', authenticate, propertyController.updateProperty)
  *       403:
  *         description: Unauthorized
  */
-router.delete('/:id', authenticate, propertyController.deleteProperty)
+router.delete("/:id", authenticate, propertyController.deleteProperty);
 
 /**
  * @swagger
@@ -195,10 +195,10 @@ router.delete('/:id', authenticate, propertyController.deleteProperty)
  *       200:
  *         description: Similar properties list
  */
-router.get('/:id/similar', propertyController.getSimilarProperties)
+router.get("/:id/similar", propertyController.getSimilarProperties);
 
 function getAllPropertiesHandler(req, res, next) {
-  propertyController.getAllProperties(req, res, next)
+  propertyController.getAllProperties(req, res, next);
 }
 
-module.exports = router
+module.exports = router;

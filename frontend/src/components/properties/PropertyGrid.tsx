@@ -1,18 +1,18 @@
-import { Property } from '@/types'
-import PropertyCard from './PropertyCard'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import ErrorMessage from '@/components/ui/ErrorMessage'
+import { Property } from "@/types";
+import PropertyCard from "./PropertyCard";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 interface PropertyGridProps {
-  properties: Property[]
-  loading?: boolean
-  error?: string
+  properties: Property[];
+  loading?: boolean;
+  error?: string;
 }
 
 const PropertyGrid = ({ properties, loading, error }: PropertyGridProps) => {
-  if (loading) return <LoadingSpinner size="lg" />
+  if (loading) return <LoadingSpinner size="lg" />;
 
-  if (error) return <ErrorMessage message={error} />
+  if (error) return <ErrorMessage message={error} />;
 
   if (properties.length === 0) {
     return (
@@ -30,10 +30,12 @@ const PropertyGrid = ({ properties, loading, error }: PropertyGridProps) => {
             d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
           />
         </svg>
-        <h3 className="text-gray-500 text-lg font-medium">No properties found</h3>
+        <h3 className="text-gray-500 text-lg font-medium">
+          No properties found
+        </h3>
         <p className="text-gray-400 text-sm mt-1">Try adjusting your filters</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -42,7 +44,7 @@ const PropertyGrid = ({ properties, loading, error }: PropertyGridProps) => {
         <PropertyCard key={property.id} property={property} />
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default PropertyGrid
+export default PropertyGrid;

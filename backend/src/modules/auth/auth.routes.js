@@ -1,7 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const authController = require('./auth.controller')
-const authenticate = require('../../middleware/auth')
+const express = require("express");
+const router = express.Router();
+const authController = require("./auth.controller");
+const authenticate = require("../../middleware/auth");
 
 /**
  * @swagger
@@ -41,7 +41,7 @@ const authenticate = require('../../middleware/auth')
  *       409:
  *         description: Email already exists
  */
-router.post('/register', authController.register)
+router.post("/register", authController.register);
 
 /**
  * @swagger
@@ -69,7 +69,7 @@ router.post('/register', authController.register)
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authController.login)
+router.post("/login", authController.login);
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ router.post('/login', authController.login)
  *       content:
  *         application/json:
  *           schema:
- *             type: object"C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d realestate
+ *             type: object
  *             properties:
  *               refreshToken:
  *                 type: string
@@ -90,7 +90,7 @@ router.post('/login', authController.login)
  *       200:
  *         description: New access token generated
  */
-router.post('/refresh', authController.refreshToken)
+router.post("/refresh", authController.refreshToken);
 
 /**
  * @swagger
@@ -106,6 +106,6 @@ router.post('/refresh', authController.refreshToken)
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', authenticate, authController.getMe)
+router.get("/me", authenticate, authController.getMe);
 
-module.exports = router
+module.exports = router;

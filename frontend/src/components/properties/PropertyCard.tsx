@@ -1,22 +1,21 @@
-import Link from 'next/link'
-import { Property } from '@/types'
-import { MapPin, Bed, Bath, Square, IndianRupee } from 'lucide-react'
+import Link from "next/link";
+import { Property } from "@/types";
+import { MapPin, Bed, Bath, Square, IndianRupee } from "lucide-react";
 
 interface PropertyCardProps {
-  property: Property
+  property: Property;
 }
 
 const formatPrice = (price: number) => {
-  if (price >= 10000000) return `${(price / 10000000).toFixed(1)} Cr`
-  if (price >= 100000) return `${(price / 100000).toFixed(1)} L`
-  return price.toLocaleString('en-IN')
-}
+  if (price >= 10000000) return `${(price / 10000000).toFixed(1)} Cr`;
+  if (price >= 100000) return `${(price / 100000).toFixed(1)} L`;
+  return price.toLocaleString("en-IN");
+};
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
     <Link href={`/properties/${property.id}`}>
       <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer border border-gray-100">
-
         {/* Image */}
         <div className="relative h-48 bg-gradient-to-br from-blue-100 to-blue-200">
           {property.images && property.images.length > 0 ? (
@@ -27,11 +26,24 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-blue-400">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  points="9 22 9 12 15 12 15 22" />
+              <svg
+                className="w-16 h-16"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                />
+                <polyline
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  points="9 22 9 12 15 12 15 22"
+                />
               </svg>
             </div>
           )}
@@ -65,7 +77,10 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           {/* Location */}
           <div className="flex items-center gap-1 text-gray-500 text-sm mb-3">
             <MapPin size={14} />
-            <span>{property.locality ? `${property.locality}, ` : ''}{property.city}</span>
+            <span>
+              {property.locality ? `${property.locality}, ` : ""}
+              {property.city}
+            </span>
           </div>
 
           {/* Features */}
@@ -76,12 +91,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
                 <span>{property.bedrooms} BHK</span>
               </div>
             )}
-            {property.bathrooms !== undefined && property.bathrooms !== null && (
-              <div className="flex items-center gap-1">
-                <Bath size={14} />
-                <span>{property.bathrooms} Bath</span>
-              </div>
-            )}
+            {property.bathrooms !== undefined &&
+              property.bathrooms !== null && (
+                <div className="flex items-center gap-1">
+                  <Bath size={14} />
+                  <span>{property.bathrooms} Bath</span>
+                </div>
+              )}
             {property.area_sqft && (
               <div className="flex items-center gap-1">
                 <Square size={14} />
@@ -92,7 +108,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
       </div>
     </Link>
-  )
-}
+  );
+};
 
-export default PropertyCard
+export default PropertyCard;

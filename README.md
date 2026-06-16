@@ -38,6 +38,7 @@ real-estate-platform/
 ### 1. Authentication — Token Strategy
 
 Dual-token JWT strategy:
+
 - **Access token** — 15 minute expiry, used on every protected request
 - **Refresh token** — 7 day expiry, used only to mint a new access token
 
@@ -78,6 +79,7 @@ This reuses the existing `city` and `property_type` indexes, so the lookup stays
 ### 5. Lead/Inquiry Module — Spam & Duplicate Prevention
 
 Three layers of protection:
+
 - **Duplicate inquiries:** a `UNIQUE(property_id, sender_id)` database constraint is the source of truth, backed by an explicit pre-check in the service for a clean error message rather than a raw DB error leaking through.
 - **Self-inquiry block:** an owner cannot message themselves about their own listing.
 - **Rate limiting:** capped at 5 inquiries per hour per user, enforced with a `COUNT(*) ... WHERE created_at > NOW() - INTERVAL '1 hour'` check. This is layered on top of the global `express-rate-limit` middleware (100 requests / 15 min / IP) already applied to all `/api` routes — one guards against general API abuse, the other specifically against lead spam.
@@ -99,6 +101,7 @@ Swagger is generated from JSDoc-style comments directly above each route definit
 ## Setup
 
 ### Backend
+
 ```bash
 cd backend
 npm install
@@ -107,6 +110,7 @@ node server.js
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
 npm install

@@ -1,12 +1,12 @@
-import { Property } from '@/types'
-import PropertyCard from './PropertyCard'
+import { Property } from "@/types";
+import PropertyCard from "./PropertyCard";
 
 interface SimilarPropertiesProps {
-  properties: Property[]
+  properties: Property[];
 }
 
 const SimilarProperties = ({ properties }: SimilarPropertiesProps) => {
-  if (properties.length === 0) return null
+  if (properties.length === 0) return null;
 
   return (
     <div className="mt-12">
@@ -19,7 +19,7 @@ const SimilarProperties = ({ properties }: SimilarPropertiesProps) => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SimilarProperties
+export default SimilarProperties;

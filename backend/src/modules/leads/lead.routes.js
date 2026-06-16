@@ -1,7 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const leadController = require('./lead.controller')
-const authenticate = require('../../middleware/auth')
+const express = require("express");
+const router = express.Router();
+const leadController = require("./lead.controller");
+const authenticate = require("../../middleware/auth");
 
 /**
  * @swagger
@@ -40,7 +40,7 @@ const authenticate = require('../../middleware/auth')
  *       429:
  *         description: Too many inquiries
  */
-router.post('/', authenticate, leadController.createLead)
+router.post("/", authenticate, leadController.createLead);
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ router.post('/', authenticate, leadController.createLead)
  *       200:
  *         description: List of received inquiries
  */
-router.get('/received', authenticate, leadController.getMyLeads)
+router.get("/received", authenticate, leadController.getMyLeads);
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ router.get('/received', authenticate, leadController.getMyLeads)
  *       200:
  *         description: List of sent inquiries
  */
-router.get('/sent', authenticate, leadController.getMySentLeads)
+router.get("/sent", authenticate, leadController.getMySentLeads);
 
 /**
  * @swagger
@@ -100,6 +100,6 @@ router.get('/sent', authenticate, leadController.getMySentLeads)
  *       403:
  *         description: Unauthorized
  */
-router.put('/:id/status', authenticate, leadController.updateLeadStatus)
+router.put("/:id/status", authenticate, leadController.updateLeadStatus);
 
-module.exports = router
+module.exports = router;

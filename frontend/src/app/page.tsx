@@ -29,7 +29,7 @@ export default function HomePage() {
             rent with confidence.
           </p>
 
-         <HeroSearch />
+          <HeroSearch />
         </div>
       </section>
 

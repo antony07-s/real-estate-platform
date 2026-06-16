@@ -1,44 +1,60 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext'
-import Button from '@/components/ui/Button'
-import { Home, Plus, LayoutDashboard, LogOut, User, Menu, X } from 'lucide-react'
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import Button from "@/components/ui/Button";
+import {
+  Home,
+  Plus,
+  LayoutDashboard,
+  LogOut,
+  User,
+  Menu,
+  X,
+} from "lucide-react";
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated } = useAuth()
-  const router = useRouter()
-  const [menuOpen, setMenuOpen] = useState(false)
+  const { user, logout, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    logout()
-    setMenuOpen(false)
-    router.push('/')
-  }
+    logout();
+    setMenuOpen(false);
+    router.push("/");
+  };
 
-  const closeMenu = () => setMenuOpen(false)
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 text-blue-600 font-bold text-xl">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-blue-600 font-bold text-xl"
+        >
           <Home size={24} />
           RealEstate
         </Link>
 
         {/* Desktop Nav — hidden on mobile */}
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/properties" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+          <Link
+            href="/properties"
+            className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+          >
             Properties
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link href="/dashboard" className="flex items-center gap-1 text-gray-600 hover:text-blue-600 font-medium transition-colors">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-1 text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
                 <LayoutDashboard size={16} />
                 Dashboard
               </Link>
@@ -55,7 +71,12 @@ const Navbar = () => {
                 <span className="text-sm font-medium">{user?.name}</span>
               </div>
 
-              <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-1"
+              >
                 <LogOut size={16} />
                 Logout
               </Button>
@@ -63,7 +84,9 @@ const Navbar = () => {
           ) : (
             <>
               <Link href="/login">
-                <Button variant="outline" size="sm">Login</Button>
+                <Button variant="outline" size="sm">
+                  Login
+                </Button>
               </Link>
               <Link href="/register">
                 <Button size="sm">Register</Button>
@@ -85,18 +108,30 @@ const Navbar = () => {
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t px-4 py-4 flex flex-col gap-3">
-          <Link href="/properties" onClick={closeMenu} className="text-gray-600 font-medium py-1">
+          <Link
+            href="/properties"
+            onClick={closeMenu}
+            className="text-gray-600 font-medium py-1"
+          >
             Properties
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link href="/dashboard" onClick={closeMenu} className="flex items-center gap-2 text-gray-600 font-medium py-1">
+              <Link
+                href="/dashboard"
+                onClick={closeMenu}
+                className="flex items-center gap-2 text-gray-600 font-medium py-1"
+              >
                 <LayoutDashboard size={16} />
                 Dashboard
               </Link>
 
-              <Link href="/properties/new" onClick={closeMenu} className="flex items-center gap-2 text-gray-600 font-medium py-1">
+              <Link
+                href="/properties/new"
+                onClick={closeMenu}
+                className="flex items-center gap-2 text-gray-600 font-medium py-1"
+              >
                 <Plus size={16} />
                 List Property
               </Link>
@@ -106,7 +141,12 @@ const Navbar = () => {
                 <span className="text-sm font-medium">{user?.name}</span>
               </div>
 
-              <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center justify-center gap-1 w-full">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-1 w-full"
+              >
                 <LogOut size={16} />
                 Logout
               </Button>
@@ -114,17 +154,21 @@ const Navbar = () => {
           ) : (
             <div className="flex flex-col gap-2 border-t pt-3">
               <Link href="/login" onClick={closeMenu}>
-                <Button variant="outline" size="sm" className="w-full">Login</Button>
+                <Button variant="outline" size="sm" className="w-full">
+                  Login
+                </Button>
               </Link>
               <Link href="/register" onClick={closeMenu}>
-                <Button size="sm" className="w-full">Register</Button>
+                <Button size="sm" className="w-full">
+                  Register
+                </Button>
               </Link>
             </div>
           )}
         </div>
       )}
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
