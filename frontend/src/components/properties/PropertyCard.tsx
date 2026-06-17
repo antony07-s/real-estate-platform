@@ -15,7 +15,7 @@ const formatPrice = (price: number) => {
 const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
     <Link href={`/properties/${property.id}`}>
-      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer border border-gray-100">
+      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer border border-gray-100 h-full flex flex-col">
         {/* Image */}
         <div className="relative h-48 bg-gradient-to-br from-blue-100 to-blue-200">
           {property.images && property.images.length > 0 ? (
@@ -62,7 +62,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-1">
           {/* Price */}
           <div className="flex items-center gap-1 text-blue-600 font-bold text-xl mb-1">
             <IndianRupee size={18} />
@@ -84,7 +84,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           </div>
 
           {/* Features */}
-          <div className="flex items-center gap-4 text-gray-600 text-sm border-t pt-3">
+<div className="flex items-center gap-4 text-gray-600 text-sm border-t pt-3 mt-auto">
             {property.bedrooms !== undefined && property.bedrooms !== null && (
               <div className="flex items-center gap-1">
                 <Bed size={14} />

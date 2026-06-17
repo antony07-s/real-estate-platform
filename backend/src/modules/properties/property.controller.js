@@ -147,6 +147,20 @@ const getSimilarProperties = async (req, res, next) => {
   }
 };
 
+// ─── Get City Suggestions ───────────────────────────
+const getCitySuggestions = async (req, res, next) => {
+  try {
+    const { q } = req.query
+    if (!q || q.length < 1) {
+      return res.status(200).json({ success: true, data: [] })
+    }
+    const cities = await propertyService.getCitySuggestions(q)
+    res.status(200).json({ success: true, data: cities })
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
   createProperty,
   getAllProperties,
@@ -154,4 +168,8 @@ module.exports = {
   updateProperty,
   deleteProperty,
   getSimilarProperties,
+  getCitySuggestions
 };
+
+
+

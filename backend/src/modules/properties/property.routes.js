@@ -115,6 +115,25 @@ router.get("/", getAllPropertiesHandler);
  */
 router.post("/", authenticate, propertyController.createProperty);
 
+
+/**
+ * @swagger
+ * /api/properties/cities:
+ *   get:
+ *     summary: Get city autocomplete suggestions
+ *     tags: [Properties]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of matching city names
+ */
+router.get('/cities', propertyController.getCitySuggestions)
+
+
 /**
  * @swagger
  * /api/properties/{id}:

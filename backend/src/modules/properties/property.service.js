@@ -307,6 +307,19 @@ const getSimilarProperties = async (propertyId) => {
   return result.rows;
 };
 
+// ─── Get City Suggestions (autocomplete) ────────────
+const getCitySuggestions = async (query) => {
+  const result = await pool.query(
+    `SELECT DISTINCT city 
+     FROM properties 
+     WHERE city ILIKE $1 
+     ORDER BY city ASC 
+     LIMIT 8`,
+    [`${query}%`]
+  )
+  return result.rows.map(row => row.city)
+}
+
 module.exports = {
   createProperty,
   getAllProperties,
@@ -314,4 +327,5 @@ module.exports = {
   updateProperty,
   deleteProperty,
   getSimilarProperties,
+  getCitySuggestions
 };

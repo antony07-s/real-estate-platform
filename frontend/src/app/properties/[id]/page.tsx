@@ -78,12 +78,12 @@ export default async function PropertyDetailPage({
 
       <div className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
         {/* Image */}
-        <div className="rounded-xl overflow-hidden h-96 bg-gradient-to-br from-blue-100 to-blue-200 mb-6">
+        <div className="rounded-xl overflow-hidden h-64 sm:h-80 md:h-[28rem] lg:h-[38rem] bg-gradient-to-br from-blue-100 to-blue-200 mb-6 relative">
           {property.images && property.images.length > 0 ? (
             <img
               src={property.images[0]}
               alt={property.title}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-blue-300">

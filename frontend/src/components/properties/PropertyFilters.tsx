@@ -8,19 +8,21 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 interface PropertyFiltersProps {
   onFilter: (filters: PropertyFilters) => void;
   loading?: boolean;
+  initialFilters?: PropertyFilters;
 }
 
 const PropertyFiltersComponent = ({
   onFilter,
   loading,
+  initialFilters,
 }: PropertyFiltersProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [filters, setFilters] = useState<PropertyFilters>({
-    city: "",
-    min_price: undefined,
-    max_price: undefined,
-    property_type: "",
-    bedrooms: undefined,
+    city: initialFilters?.city || "",
+    min_price: initialFilters?.min_price,
+    max_price: initialFilters?.max_price,
+    property_type: initialFilters?.property_type || "",
+    bedrooms: initialFilters?.bedrooms,
     sort_by: "created_at",
     sort_order: "DESC",
   });

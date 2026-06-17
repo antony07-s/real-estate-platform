@@ -38,11 +38,10 @@ export default function NewPropertyPage() {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
   } = useForm<PropertyFormInput>({
-  resolver: zodResolver(propertySchema),
-});
+    resolver: zodResolver(propertySchema),
+  });
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -135,12 +134,14 @@ export default function NewPropertyPage() {
             <Input
               label="Bedrooms"
               type="number"
+              placeholder="0"
               {...register("bedrooms")}
               error={errors.bedrooms?.message}
             />
             <Input
               label="Bathrooms"
               type="number"
+              placeholder="0"
               {...register("bathrooms")}
               error={errors.bathrooms?.message}
             />
@@ -186,5 +187,3 @@ export default function NewPropertyPage() {
     </div>
   );
 }
-
-
