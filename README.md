@@ -123,5 +123,5 @@ Backend runs on `http://localhost:5000`, frontend on `http://localhost:3000`, AP
 
 - Dashboard "my listings" currently filters client-side; a dedicated `GET /api/properties/my` endpoint using the existing `user_id` index would be the production-correct approach.
 - Deep pagination (`OFFSET`-based) should move to cursor-based pagination at true 50k+ scale.
-- Image upload is URL-based rather than direct file upload; would integrate with S3/Cloudinary pre-signed URLs in production.
+- Image handling accepts a single image URL per listing rather than direct file upload/multi-image galleries; in production this would integrate with S3/Cloudinary pre-signed upload URLs, storing the resulting URLs in the existing `images` array column.
 - No automated test suite was included given the assignment's time constraint; route-level integration tests (Jest + Supertest) would be the next addition.
