@@ -13,7 +13,6 @@ import {
   User,
   Menu,
   X,
-  AlertTriangle,
 } from "lucide-react";
 
 const LogoutModal = ({
@@ -49,7 +48,7 @@ const LogoutModal = ({
         </button>
         <button
           onClick={onConfirm}
-          className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-orange-600 transition flex items-center justify-center gap-2"
+          className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2"
         >
           <LogOut size={15} />
           Logout

@@ -41,6 +41,11 @@ const PropertyFiltersComponent = ({
     onFilter(filters);
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSearch();
+  };
+
   const handleReset = () => {
     const reset: PropertyFilters = {
       city: "",
@@ -56,7 +61,7 @@ const PropertyFiltersComponent = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-4 mb-6">
       {/* Main Search Row */}
       <div className="flex gap-3 flex-wrap">
         {/* City Search */}
@@ -105,6 +110,7 @@ const PropertyFiltersComponent = ({
 
         {/* Advanced Toggle */}
         <button
+          type="button"
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600 border border-gray-300 rounded-lg px-3 py-2"
         >
@@ -113,12 +119,13 @@ const PropertyFiltersComponent = ({
         </button>
 
         {/* Search Button */}
-        <Button onClick={handleSearch} loading={loading} size="md">
+        <Button type="submit" loading={loading} size="md">
           Search
         </Button>
 
         {/* Reset */}
         <button
+          type="button"
           onClick={handleReset}
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-red-500"
         >
@@ -191,7 +198,7 @@ const PropertyFiltersComponent = ({
           </div>
         </div>
       )}
-    </div>
+    </form>
   );
 };
 

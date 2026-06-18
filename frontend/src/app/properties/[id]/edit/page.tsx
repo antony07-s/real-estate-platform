@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type WheelEvent } from "react";
+import { useState, useEffect, useCallback, type WheelEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -49,6 +49,25 @@ const removeEmptyOptionalFields = (payload: Record<string, unknown>) => {
   });
 };
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "response" in error &&
+    typeof error.response === "object" &&
+    error.response !== null &&
+    "data" in error.response &&
+    typeof error.response.data === "object" &&
+    error.response.data !== null &&
+    "error" in error.response.data &&
+    typeof error.response.data.error === "string"
+  ) {
+    return error.response.data.error;
+  }
+
+  return fallback;
+};
+
 export default function EditPropertyPage() {
   useDocumentTitle("Edit Property");
 
@@ -63,19 +82,11 @@ export default function EditPropertyPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [currentImageName, setCurrentImageName] = useState("");
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<PropertyFormInput>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<PropertyFormInput, unknown, PropertyFormData>({
     resolver: zodResolver(propertySchema),
   });
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    if (isAuthenticated) fetchProperty();
-  }, [authLoading, isAuthenticated]);
-
-  const fetchProperty = async () => {
+  const fetchProperty = useCallback(async () => {
     try {
       const response = await propertyAPI.getById(Number(id));
       const property = response.data.data.property;
@@ -99,13 +110,23 @@ export default function EditPropertyPage() {
         locality: property.locality || "",
         address: property.address || "",
       });
-    } catch (error) {
+    } catch {
       toast.error("Property not found");
       router.push("/dashboard");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, reset, router, user]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    if (isAuthenticated) {
+      void Promise.resolve().then(fetchProperty);
+    }
+  }, [authLoading, fetchProperty, isAuthenticated, router]);
 
   const onSubmit = async (data: PropertyFormData) => {
     setSubmitting(true);
@@ -122,8 +143,8 @@ export default function EditPropertyPage() {
       await propertyAPI.update(Number(id), payload);
       toast.success("Property updated successfully!");
       router.push(`/properties/${id}`);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to update");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to update"));
     } finally {
       setSubmitting(false);
     }
@@ -133,7 +154,7 @@ export default function EditPropertyPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-         <EditPropertyShimmer />;
+        <EditPropertyShimmer />
         <Footer />
       </div>
     );
@@ -155,13 +176,13 @@ export default function EditPropertyPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
 
-      <div className="max-w-2xl mx-auto px-4 py-10 flex-1 w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Edit Property</h1>
-        <p className="text-gray-500 mb-6">Update your listing details</p>
+      <div className="max-w-2xl mx-auto px-3 py-6 sm:px-4 sm:py-10 flex-1 w-full">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Edit Property</h1>
+        <p className="text-sm sm:text-base text-gray-500 mb-6">Update your listing details</p>
 
         <form
-          onSubmit={handleSubmit(onSubmit as any)}
-          className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4"
+          onSubmit={handleSubmit(onSubmit)}
+          className="bg-white rounded-xl shadow-md p-4 sm:p-6 flex flex-col gap-4"
         >
           <Input label="Title *" {...register("title")} error={errors.title?.message} />
 
@@ -170,15 +191,15 @@ export default function EditPropertyPage() {
             <textarea
               {...register("description")}
               rows={3}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className="w-full min-w-0 resize-y border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Price (₹) *" type="number" min={0} {...register("price")} error={errors.price?.message} />
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">Property Type</label>
-              <select {...register("property_type")} className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500">
+              <select {...register("property_type")} className="w-full min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500">
                 <option value="apartment">Apartment</option>
                 <option value="house">House</option>
                 <option value="villa">Villa</option>
@@ -187,7 +208,7 @@ export default function EditPropertyPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input label="Bedrooms" type="number" min={0} {...register("bedrooms")} onWheel={preventNumberInputWheel} error={errors.bedrooms?.message} />
             <Input label="Bathrooms" type="number" min={0} {...register("bathrooms")} onWheel={preventNumberInputWheel} error={errors.bathrooms?.message} />
             <Input label="Area (sqft) *" type="number" min={0} {...register("area_sqft")} error={errors.area_sqft?.message} />
@@ -202,14 +223,14 @@ export default function EditPropertyPage() {
 
             {/* current image filename as text */}
             {currentImageName && !imageFile && (
-              <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+              <div className="flex min-w-0 items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
                 <span className="text-sm text-gray-600 flex-1 truncate">📎 {currentImageName}</span>
               </div>
             )}
 
             {/* new file selected — show name with remove option */}
             {imageFile && (
-              <div className="flex items-center gap-2 border border-blue-300 rounded-lg px-3 py-2 bg-blue-50">
+              <div className="flex min-w-0 items-center gap-2 border border-blue-300 rounded-lg px-3 py-2 bg-blue-50">
                 <span className="text-sm text-gray-700 flex-1 truncate">📎 {imageFile.name}</span>
                 <button
                   type="button"
@@ -225,7 +246,7 @@ export default function EditPropertyPage() {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-              className="w-full border rounded-lg p-2 text-sm text-gray-900"
+              className="w-full min-w-0 border rounded-lg p-2 text-sm text-gray-900 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:text-gray-700"
             />
           </div>
 
