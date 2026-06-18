@@ -7,10 +7,11 @@ import { Property } from "@/types";
 import { MapPin, Bed, Bath, Square, Calendar } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Home } from "lucide-react";
+import { API_BASE_URL } from "@/lib/config";
 // ─── Fetch property data on the SERVER ──────────────
 async function getProperty(id: string) {
   try {
-    const res = await fetch(`http://localhost:5000/api/properties/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/properties/${id}`, {
       next: { revalidate: 60 }, // ISR: re-fetch fresh data every 60 seconds
     });
     if (!res.ok) return null;
@@ -22,7 +23,6 @@ async function getProperty(id: string) {
 }
 
 // ─── Dynamic SEO Metadata ────────────────────────────
-// This runs on the server BEFORE page renders — Google sees this!
 export async function generateMetadata({
   params,
 }: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type WheelEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,6 +29,12 @@ const propertySchema = z.object({
 
 type PropertyFormInput = z.input<typeof propertySchema>;
 type PropertyFormData = z.output<typeof propertySchema>;
+
+const preventNumberInputWheel = (
+  event: WheelEvent<HTMLInputElement>,
+) => {
+  event.currentTarget.blur();
+};
 
 export default function NewPropertyPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -136,6 +142,7 @@ export default function NewPropertyPage() {
               type="number"
               placeholder="0"
               {...register("bedrooms")}
+              onWheel={preventNumberInputWheel}
               error={errors.bedrooms?.message}
             />
             <Input
@@ -143,6 +150,7 @@ export default function NewPropertyPage() {
               type="number"
               placeholder="0"
               {...register("bathrooms")}
+              onWheel={preventNumberInputWheel}
               error={errors.bathrooms?.message}
             />
             <Input

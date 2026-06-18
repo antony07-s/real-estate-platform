@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type WheelEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,6 +30,12 @@ const propertySchema = z.object({
 
 type PropertyFormInput = z.input<typeof propertySchema>;
 type PropertyFormData = z.output<typeof propertySchema>;
+
+const preventNumberInputWheel = (
+  event: WheelEvent<HTMLInputElement>,
+) => {
+  event.currentTarget.blur();
+};
 
 export default function EditPropertyPage() {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -68,7 +74,6 @@ export default function EditPropertyPage() {
         return;
       }
 
-      //  Fix: use ?? 0 to prevent null resetting to 0
       reset({
         title: property.title,
         description: property.description || "",
@@ -190,12 +195,14 @@ export default function EditPropertyPage() {
               label="Bedrooms"
               type="number"
               {...register("bedrooms")}
+              onWheel={preventNumberInputWheel}
               error={errors.bedrooms?.message}
             />
             <Input
               label="Bathrooms"
               type="number"
               {...register("bathrooms")}
+              onWheel={preventNumberInputWheel}
               error={errors.bathrooms?.message}
             />
             <Input
