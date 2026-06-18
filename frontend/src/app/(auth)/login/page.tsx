@@ -8,8 +8,11 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import toast from "react-hot-toast";
 import { Home } from "lucide-react";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function LoginPage() {
+  useDocumentTitle("Login");
+
   const { login } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -66,7 +69,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
-              label="Email"
+              label="Email *"
               type="email"
               placeholder="you@example.com"
               value={formData.email}
@@ -76,7 +79,7 @@ export default function LoginPage() {
               error={errors.email}
             />
             <Input
-              label="Password"
+              label="Password *"
               type="password"
               placeholder="••••••••"
               value={formData.password}

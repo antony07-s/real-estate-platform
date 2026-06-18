@@ -103,10 +103,12 @@ router.get("/", getAllPropertiesHandler);
  *                 type: string
  *               address:
  *                 type: string
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *               blob:
+ *                 type: string
+ *                 description: Base64 data URL for the uploaded image
+ *               blob_mime_type:
+ *                 type: string
+ *                 example: image/jpeg
  *     responses:
  *       201:
  *         description: Property created successfully

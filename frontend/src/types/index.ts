@@ -23,6 +23,9 @@ export interface Property {
   address?: string;
   latitude?: number;
   longitude?: number;
+  blob?: string;
+  blob_mime_type?: string;
+  blob_file_name?: string;
   images?: string[];
   is_available: boolean;
   created_at: string;

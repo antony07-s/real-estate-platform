@@ -4,7 +4,7 @@ const Joi = require("joi");
 // ─── Validation Schema ──────────────────────────────
 const propertySchema = Joi.object({
   title: Joi.string().min(5).max(255).required(),
-  description: Joi.string().optional(),
+  description: Joi.string().allow("").optional(),
   price: Joi.number().positive().required(),
   property_type: Joi.string()
     .valid("apartment", "house", "villa", "plot")
@@ -13,11 +13,15 @@ const propertySchema = Joi.object({
   bathrooms: Joi.number().integer().min(0).optional(),
   area_sqft: Joi.number().positive().optional(),
   city: Joi.string().required(),
-  locality: Joi.string().optional(),
-  address: Joi.string().optional(),
+  locality: Joi.string().allow("").optional(),
+  address: Joi.string().allow("").optional(),
   latitude: Joi.number().optional(),
   longitude: Joi.number().optional(),
-  images: Joi.array().items(Joi.string().uri()).optional(),
+  blob: Joi.string().optional(),
+  blob_mime_type: Joi.string()
+    .valid("image/jpeg", "image/png", "image/webp", "image/gif")
+    .optional(),
+  blob_file_name: Joi.string().max(255).optional(),
 });
 
 // ─── Create Property ────────────────────────────────
@@ -170,6 +174,3 @@ module.exports = {
   getSimilarProperties,
   getCitySuggestions
 };
-
-
-

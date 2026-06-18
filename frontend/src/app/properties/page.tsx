@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import PropertyFilters from '@/components/properties/PropertyFilters'
@@ -10,10 +10,12 @@ import Button from '@/components/ui/Button'
 import { propertyAPI } from '@/lib/api'
 import { Property, PropertyFilters as Filters, Pagination } from '@/types'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import useDocumentTitle from '@/hooks/useDocumentTitle'
 
 export default function PropertiesPage() {
+  useDocumentTitle('Find Properties')
+
   const searchParams = useSearchParams()
-  const router = useRouter()
 
   const [properties, setProperties] = useState<Property[]>([])
   const [pagination, setPagination] = useState<Pagination | null>(null)
@@ -36,8 +38,6 @@ export default function PropertiesPage() {
     }
   }, [])
 
-  // Re-run whenever the URL's search params actually change
-  // (e.g. clicking a "Villas" link while already on /properties)
   useEffect(() => {
     const filtersFromUrl: Filters = {
       city: searchParams.get('city') || undefined,
@@ -64,11 +64,8 @@ export default function PropertiesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-
       <div className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">
-          Find Your Property
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">Find Your Property</h1>
         <p className="text-gray-500 mb-6">
           {pagination ? `${pagination.total} properties found` : 'Loading...'}
         </p>
@@ -80,38 +77,23 @@ export default function PropertiesPage() {
           loading={loading}
         />
 
+        {/* PropertyGrid shimmer via loading prop */}
         <PropertyGrid properties={properties} loading={loading} error={error} />
 
-        {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-10">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === 1}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              <ChevronLeft size={16} />
-              Prev
+            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => handlePageChange(page - 1)}>
+              <ChevronLeft size={16} /> Prev
             </Button>
-
             <span className="text-sm text-gray-600">
               Page {pagination.currentPage} of {pagination.totalPages}
             </span>
-
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === pagination.totalPages}
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Next
-              <ChevronRight size={16} />
+            <Button variant="outline" size="sm" disabled={page === pagination.totalPages} onClick={() => handlePageChange(page + 1)}>
+              Next <ChevronRight size={16} />
             </Button>
           </div>
         )}
       </div>
-
       <Footer />
     </div>
   )

@@ -8,8 +8,11 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import toast from "react-hot-toast";
 import { Home } from "lucide-react";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function RegisterPage() {
+  useDocumentTitle("Register");
+
   const { register } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -25,7 +28,10 @@ export default function RegisterPage() {
     const newErrors: Record<string, string> = {};
     if (!formData.name || formData.name.length < 2)
       newErrors.name = "Name must be at least 2 characters";
-    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.email)
+      newErrors.email = "Email is required";
+    if (!formData.phone)
+      newErrors.phone = "Phone number is required";
     if (!formData.password || formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
     setErrors(newErrors);
@@ -71,7 +77,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
-              label="Full Name"
+              label="Full Name *"
               placeholder="John Doe"
               value={formData.name}
               onChange={(e) =>
@@ -80,7 +86,7 @@ export default function RegisterPage() {
               error={errors.name}
             />
             <Input
-              label="Email"
+              label="Email *"
               type="email"
               placeholder="you@example.com"
               value={formData.email}
@@ -90,16 +96,17 @@ export default function RegisterPage() {
               error={errors.email}
             />
             <Input
-              label="Phone (optional)"
+              label="Phone *"
               type="tel"
               placeholder="9876543210"
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
+              error={errors.phone}
             />
             <Input
-              label="Password"
+              label="Password *"
               type="password"
               placeholder="••••••••"
               value={formData.password}

@@ -1,123 +1,109 @@
 const pool = require("../../config/db");
 
+const imageBlobToDataUrl = (row) => {
+  if (!row.blob || !Buffer.isBuffer(row.blob)) return null;
+  const mimeType = row.blob_mime_type || "image/jpeg";
+  return `data:${mimeType};base64,${row.blob.toString("base64")}`;
+};
+
+const serializeProperty = (row) => {
+  const imageDataUrl = imageBlobToDataUrl(row);
+  return {
+    ...row,
+    blob: imageDataUrl,
+    images: imageDataUrl ? [imageDataUrl] : row.images,
+  };
+};
+
+const decodeImageBlob = (blob) => {
+  if (!blob) return null;
+  const dataUrlMatch = blob.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  const base64 = dataUrlMatch ? dataUrlMatch[2] : blob;
+  return Buffer.from(base64, "base64");
+};
+
 // ─── Create Property ────────────────────────────────
 const createProperty = async (userId, data) => {
   const {
-    title,
-    description,
-    price,
-    property_type,
-    bedrooms,
-    bathrooms,
-    area_sqft,
-    city,
-    locality,
-    address,
-    latitude,
-    longitude,
-    images,
+    title, description, price, property_type,
+    bedrooms, bathrooms, area_sqft, city,
+    locality, address, latitude, longitude,
+    blob, blob_mime_type, blob_file_name,
   } = data;
+
+  const imageBlob = decodeImageBlob(blob);
 
   const result = await pool.query(
     `INSERT INTO properties 
       (user_id, title, description, price, property_type,
        bedrooms, bathrooms, area_sqft, city, locality,
-       address, latitude, longitude, images)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       address, latitude, longitude, blob, blob_mime_type, blob_file_name)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING *`,
     [
-      userId,
-      title,
-      description,
-      price,
-      property_type,
-      bedrooms,
-      bathrooms,
-      area_sqft,
-      city,
-      locality,
-      address,
-      latitude,
-      longitude,
-      images,
+      userId, title, description, price, property_type,
+      bedrooms, bathrooms, area_sqft, city, locality,
+      address, latitude, longitude, imageBlob, blob_mime_type, blob_file_name,
     ],
   );
 
-  return result.rows[0];
+  return serializeProperty(result.rows[0]);
 };
 
 // ─── Get All Properties (Search + Filter + Pagination) ──
 const getAllProperties = async (filters) => {
   const {
-    city,
-    min_price,
-    max_price,
-    property_type,
-    bedrooms,
-    sort_by = "created_at",
-    sort_order = "DESC",
-    page = 1,
-    limit = 10,
+    city, min_price, max_price, property_type, bedrooms,
+    sort_by = "created_at", sort_order = "DESC",
+    page = 1, limit = 10,
   } = filters;
 
-  // Dynamic query building
   let conditions = ["p.is_available = true"];
   let values = [];
   let paramCount = 1;
 
-  // Search by city
   if (city) {
     conditions.push(`p.city ILIKE $${paramCount}`);
     values.push(`%${city}%`);
     paramCount++;
   }
-
-  // Filter by price range
   if (min_price) {
     conditions.push(`p.price >= $${paramCount}`);
     values.push(min_price);
     paramCount++;
   }
-
   if (max_price) {
     conditions.push(`p.price <= $${paramCount}`);
     values.push(max_price);
     paramCount++;
   }
-
-  // Filter by property type
   if (property_type) {
     conditions.push(`p.property_type = $${paramCount}`);
     values.push(property_type);
     paramCount++;
   }
 
-  // Filter by bedrooms
   if (bedrooms) {
-    conditions.push(`p.bedrooms = $${paramCount}`);
-    values.push(bedrooms);
-    paramCount++;
+    if (Number(bedrooms) >= 4) {
+      conditions.push(`p.bedrooms >= $${paramCount}`)
+    } else {
+      conditions.push(`p.bedrooms = $${paramCount}`)
+    }
+    values.push(bedrooms)
+    paramCount++
   }
 
-  // Allowed sort columns (prevent SQL injection)
   const allowedSortColumns = ["price", "created_at", "area_sqft", "bedrooms"];
-  const sortColumn = allowedSortColumns.includes(sort_by)
-    ? sort_by
-    : "created_at";
+  const sortColumn = allowedSortColumns.includes(sort_by) ? sort_by : "created_at";
   const sortDirection = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
-  // Pagination
   const offset = (page - 1) * limit;
   values.push(limit, offset);
 
   const whereClause = conditions.join(" AND ");
 
-  // Main query — joins with users to get owner name
   const query = `
-    SELECT 
-      p.*,
-      u.name as owner_name,
-      u.phone as owner_phone
+    SELECT p.*, u.name as owner_name, u.phone as owner_phone
     FROM properties p
     JOIN users u ON p.user_id = u.id
     WHERE ${whereClause}
@@ -125,12 +111,7 @@ const getAllProperties = async (filters) => {
     LIMIT $${paramCount} OFFSET $${paramCount + 1}
   `;
 
-  // Count query for total pages
-  const countQuery = `
-    SELECT COUNT(*) 
-    FROM properties p
-    WHERE ${whereClause}
-  `;
+  const countQuery = `SELECT COUNT(*) FROM properties p WHERE ${whereClause}`;
 
   const [dataResult, countResult] = await Promise.all([
     pool.query(query, values),
@@ -141,7 +122,7 @@ const getAllProperties = async (filters) => {
   const totalPages = Math.ceil(total / limit);
 
   return {
-    properties: dataResult.rows,
+    properties: dataResult.rows.map(serializeProperty),
     pagination: {
       total,
       totalPages,
@@ -167,15 +148,13 @@ const getPropertyById = async (id) => {
     throw error;
   }
 
-  return result.rows[0];
+  // ✅ serialize so blob + blob_file_name are returned
+  return serializeProperty(result.rows[0]);
 };
 
 // ─── Update Property ────────────────────────────────
 const updateProperty = async (id, userId, data) => {
-  // Check ownership first
-  const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [
-    id,
-  ]);
+  const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [id]);
 
   if (existing.rows.length === 0) {
     const error = new Error("Property not found");
@@ -184,27 +163,19 @@ const updateProperty = async (id, userId, data) => {
   }
 
   if (existing.rows[0].user_id !== userId) {
-    const error = new Error(
-      "Unauthorized - you can only edit your own properties",
-    );
+    const error = new Error("Unauthorized - you can only edit your own properties");
     error.statusCode = 403;
     throw error;
   }
 
   const {
-    title,
-    description,
-    price,
-    property_type,
-    bedrooms,
-    bathrooms,
-    area_sqft,
-    city,
-    locality,
-    address,
-    images,
-    is_available,
+    title, description, price, property_type,
+    bedrooms, bathrooms, area_sqft, city,
+    locality, address, images, is_available,
+    blob, blob_mime_type, blob_file_name,
   } = data;
+
+  const imageBlob = blob ? decodeImageBlob(blob) : undefined;
 
   const result = await pool.query(
     `UPDATE properties SET
@@ -220,35 +191,27 @@ const updateProperty = async (id, userId, data) => {
       address = COALESCE($10, address),
       images = COALESCE($11, images),
       is_available = COALESCE($12, is_available),
+      blob = COALESCE($13, blob),
+      blob_mime_type = COALESCE($14, blob_mime_type),
+      blob_file_name = COALESCE($15, blob_file_name),
       updated_at = NOW()
-     WHERE id = $13 AND user_id = $14
+     WHERE id = $16 AND user_id = $17
      RETURNING *`,
     [
-      title,
-      description,
-      price,
-      property_type,
-      bedrooms,
-      bathrooms,
-      area_sqft,
-      city,
-      locality,
-      address,
-      images,
-      is_available,
-      id,
-      userId,
+      title, description, price, property_type,
+      bedrooms, bathrooms, area_sqft, city,
+      locality, address, images, is_available,
+      imageBlob || null, blob_mime_type || null, blob_file_name || null,
+      id, userId,
     ],
   );
 
-  return result.rows[0];
+  return serializeProperty(result.rows[0]);
 };
 
 // ─── Delete Property ────────────────────────────────
 const deleteProperty = async (id, userId) => {
-  const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [
-    id,
-  ]);
+  const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [id]);
 
   if (existing.rows.length === 0) {
     const error = new Error("Property not found");
@@ -257,9 +220,7 @@ const deleteProperty = async (id, userId) => {
   }
 
   if (existing.rows[0].user_id !== userId) {
-    const error = new Error(
-      "Unauthorized - you can only delete your own properties",
-    );
+    const error = new Error("Unauthorized - you can only delete your own properties");
     error.statusCode = 403;
     throw error;
   }
@@ -270,16 +231,11 @@ const deleteProperty = async (id, userId) => {
 
 // ─── Similar Properties ─────────────────────────────
 const getSimilarProperties = async (propertyId) => {
-  // Get current property first
-  const current = await pool.query("SELECT * FROM properties WHERE id = $1", [
-    propertyId,
-  ]);
-
+  const current = await pool.query("SELECT * FROM properties WHERE id = $1", [propertyId]);
   if (current.rows.length === 0) return [];
 
   const { city, property_type, price, bedrooms } = current.rows[0];
 
-  // Find similar — same city + type, close price range (±30%)
   const result = await pool.query(
     `SELECT p.*, u.name as owner_name
      FROM properties p
@@ -289,36 +245,22 @@ const getSimilarProperties = async (propertyId) => {
        AND p.city ILIKE $2
        AND p.property_type = $3
        AND p.price BETWEEN $4 AND $5
-     ORDER BY 
-       ABS(p.bedrooms - $6) ASC,
-       ABS(p.price - $7) ASC
+     ORDER BY ABS(p.bedrooms - $6) ASC, ABS(p.price - $7) ASC
      LIMIT 4`,
-    [
-      propertyId,
-      `%${city}%`,
-      property_type,
-      price * 0.7, // 30% below
-      price * 1.3, // 30% above
-      bedrooms || 0,
-      price,
-    ],
+    [propertyId, `%${city}%`, property_type, price * 0.7, price * 1.3, bedrooms || 0, price],
   );
 
-  return result.rows;
+  return result.rows.map(serializeProperty);
 };
 
 // ─── Get City Suggestions (autocomplete) ────────────
 const getCitySuggestions = async (query) => {
   const result = await pool.query(
-    `SELECT DISTINCT city 
-     FROM properties 
-     WHERE city ILIKE $1 
-     ORDER BY city ASC 
-     LIMIT 8`,
+    `SELECT DISTINCT city FROM properties WHERE city ILIKE $1 ORDER BY city ASC LIMIT 8`,
     [`${query}%`]
-  )
-  return result.rows.map(row => row.city)
-}
+  );
+  return result.rows.map(row => row.city);
+};
 
 module.exports = {
   createProperty,
@@ -327,5 +269,5 @@ module.exports = {
   updateProperty,
   deleteProperty,
   getSimilarProperties,
-  getCitySuggestions
+  getCitySuggestions,
 };

@@ -2,18 +2,33 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../../config/db");
 
+const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "15m";
+const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
+
+const requireSecret = (name) => {
+  const value = process.env[name];
+  if (!value || value.length < 32) {
+    throw new Error(`${name} must be set and at least 32 characters long`);
+  }
+  return value;
+};
+
+const JWT_SECRET = requireSecret("JWT_SECRET");
+const JWT_REFRESH_SECRET = requireSecret("JWT_REFRESH_SECRET");
+
 // ─── Helper: Generate Tokens ────────────────────────
 const generateTokens = (userId, email) => {
   // Access token — short lived (15 mins)
-  const accessToken = jwt.sign({ userId, email }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  const accessToken = jwt.sign({ userId, email }, JWT_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+    algorithm: "HS256",
   });
 
   // Refresh token — long lived (7 days)
   const refreshToken = jwt.sign(
     { userId, email },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN },
+    JWT_REFRESH_SECRET,
+    { expiresIn: REFRESH_TOKEN_EXPIRES_IN, algorithm: "HS256" },
   );
 
   return { accessToken, refreshToken };
@@ -90,13 +105,15 @@ const login = async ({ email, password }) => {
 const refreshToken = async (token) => {
   try {
     // Verify refresh token
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const decoded = jwt.verify(token, JWT_REFRESH_SECRET, {
+      algorithms: ["HS256"],
+    });
 
     // Generate new access token only
     const accessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN },
+      JWT_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRES_IN, algorithm: "HS256" },
     );
 
     return { accessToken };

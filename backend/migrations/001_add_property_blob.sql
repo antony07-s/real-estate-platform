@@ -1,0 +1,7 @@
+ALTER TABLE properties
+  ADD COLUMN IF NOT EXISTS blob BYTEA,
+  ADD COLUMN IF NOT EXISTS blob_mime_type VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS blob_file_name VARCHAR(255);
+
+ALTER TABLE properties
+  DROP COLUMN IF EXISTS image_url;

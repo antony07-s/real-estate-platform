@@ -17,7 +17,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
     <Link href={`/properties/${property.id}`}>
       <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer border border-gray-100 h-full flex flex-col">
         {/* Image */}
-        <div className="relative h-48 bg-gradient-to-br from-blue-100 to-blue-200">
+        <div className="relative h-48 bg-linear-to-br from-blue-100 to-blue-200">
           {property.images && property.images.length > 0 ? (
             <img
               src={property.images[0]}

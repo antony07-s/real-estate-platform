@@ -7,7 +7,7 @@ import { Property } from "@/types";
 import { MapPin, Bed, Bath, Square, Calendar } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Home } from "lucide-react";
-import { API_BASE_URL } from "@/lib/config";
+import { API_BASE_URL, SITE_URL } from "@/lib/config";
 // ─── Fetch property data on the SERVER ──────────────
 async function getProperty(id: string) {
   try {
@@ -21,6 +21,26 @@ async function getProperty(id: string) {
     return null;
   }
 }
+
+const getPropertyLocation = (property: Property) =>
+  [property.locality, property.city].filter(Boolean).join(", ");
+
+const getSeoPrice = (property: Property) =>
+  `INR ${Number(property.price).toLocaleString("en-IN")}`;
+
+const getSeoDescription = (property: Property) => {
+  const fallbackParts = [
+    property.bedrooms ? `${property.bedrooms} BHK` : null,
+    property.property_type,
+    `for sale in ${getPropertyLocation(property) || property.city}`,
+    `priced at ${getSeoPrice(property)}`,
+  ].filter(Boolean);
+
+  return (property.description || fallbackParts.join(" "))
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 160);
+};
 
 // ─── Dynamic SEO Metadata ────────────────────────────
 export async function generateMetadata({
@@ -36,17 +56,43 @@ export async function generateMetadata({
   }
 
   const property: Property = data.property;
+  const location = getPropertyLocation(property);
+  const canonicalUrl = `${SITE_URL}/properties/${property.id}`;
+  const description = getSeoDescription(property);
+  const title = `${property.title} in ${property.city}`;
+  const image = property.images?.[0];
 
   return {
-    title: `${property.title} - ${property.city}`,
-    description:
-      property.description?.slice(0, 160) ||
-      `${property.bedrooms} BHK ${property.property_type} for sale in ${property.city}. Price: ₹${property.price}`,
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
-      title: property.title,
-      description: property.description,
-      images: property.images?.[0] ? [property.images[0]] : [],
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "RealEstate Platform",
+      locale: "en_IN",
       type: "website",
+      images: image
+        ? [
+            {
+              url: image,
+              alt: `${property.title} in ${location || property.city}`,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : [],
+    },
+    robots: {
+      index: property.is_available,
+      follow: true,
     },
   };
 }
@@ -71,14 +117,44 @@ export default async function PropertyDetailPage({
 
   const property: Property = data.property;
   const similarProperties: Property[] = data.similarProperties || [];
+  const location = getPropertyLocation(property);
+  const canonicalUrl = `${SITE_URL}/properties/${property.id}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: property.title,
+    description: getSeoDescription(property),
+    image: property.images || [],
+    url: canonicalUrl,
+    category: property.property_type,
+    offers: {
+      "@type": "Offer",
+      price: Number(property.price),
+      priceCurrency: "INR",
+      availability: property.is_available
+        ? "https://schema.org/InStock"
+        : "https://schema.org/SoldOut",
+      url: canonicalUrl,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: property.address,
+      addressLocality: location || property.city,
+      addressCountry: "IN",
+    },
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
         {/* Image */}
-        <div className="rounded-xl overflow-hidden h-64 sm:h-80 md:h-[28rem] lg:h-[38rem] bg-gradient-to-br from-blue-100 to-blue-200 mb-6 relative">
+        <div className="rounded-xl overflow-hidden h-64 sm:h-80 md:h-[28rem] lg:h-[38rem] bg-linear-to-br from-blue-100 to-blue-200 mb-6 relative">
           {property.images && property.images.length > 0 ? (
             <img
               src={property.images[0]}

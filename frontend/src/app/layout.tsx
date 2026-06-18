@@ -3,10 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { SITE_URL } from "@/lib/config";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "RealEstate Platform - Find Your Dream Home",
     template: "%s | RealEstate Platform",
@@ -25,6 +27,10 @@ export const metadata: Metadata = {
     title: "RealEstate Platform",
     description: "Find your dream home",
     type: "website",
+  },
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
   },
 };
 

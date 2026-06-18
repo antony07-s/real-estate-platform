@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+.env
+.env.*
+!.env.example
+Review.md
 
 # debug
 npm-debug.log*

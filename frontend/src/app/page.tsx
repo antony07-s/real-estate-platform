@@ -4,7 +4,6 @@ import Footer from "@/components/layout/Footer";
 import Button from "@/components/ui/Button";
 import HeroSearch from "@/components/HeroSearch";
 import {
-  Search,
   Home,
   Shield,
   TrendingUp,
@@ -12,6 +11,11 @@ import {
   Warehouse,
   TreePine,
 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Find Your Dream Home",
+};
 
 export default function HomePage() {
   return (
@@ -19,7 +23,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-20 px-4">
+      <section className="bg-linear-to-br from-blue-600 to-blue-800 text-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Find Your Dream Home
@@ -35,17 +39,25 @@ export default function HomePage() {
 
       {/* Stats */}
       <section className="bg-white py-10 border-b">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-3 gap-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
           <div>
-            <div className="text-3xl font-bold text-blue-600">50,000+</div>
+            <div className="text-2xl sm:text-3xl font-bold text-blue-600 whitespace-nowrap">
+              50,000+
+            </div>
             <div className="text-gray-500 text-sm mt-1">Properties Listed</div>
           </div>
+
           <div>
-            <div className="text-3xl font-bold text-blue-600">10,000+</div>
+            <div className="text-2xl sm:text-3xl font-bold text-blue-600 whitespace-nowrap">
+              10,000+
+            </div>
             <div className="text-gray-500 text-sm mt-1">Happy Customers</div>
           </div>
+
           <div>
-            <div className="text-3xl font-bold text-blue-600">100+</div>
+            <div className="text-2xl sm:text-3xl font-bold text-blue-600 whitespace-nowrap">
+              100+
+            </div>
             <div className="text-gray-500 text-sm mt-1">Cities Covered</div>
           </div>
         </div>

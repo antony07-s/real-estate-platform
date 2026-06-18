@@ -12,6 +12,7 @@ import Footer from "@/components/layout/Footer";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import toast from "react-hot-toast";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const propertySchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(255),
@@ -24,7 +25,6 @@ const propertySchema = z.object({
   city: z.string().min(1, "City is required"),
   locality: z.string().optional(),
   address: z.string().optional(),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type PropertyFormInput = z.input<typeof propertySchema>;
@@ -36,10 +36,29 @@ const preventNumberInputWheel = (
   event.currentTarget.blur();
 };
 
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+const removeEmptyOptionalFields = (payload: Record<string, unknown>) => {
+  ["description", "locality", "address"].forEach((field) => {
+    if (payload[field] === "") {
+      delete payload[field];
+    }
+  });
+};
+
 export default function NewPropertyPage() {
+  useDocumentTitle("List Your Property");
+
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const {
     register,
@@ -59,11 +78,14 @@ export default function NewPropertyPage() {
   const onSubmit = async (data: PropertyFormData) => {
     setSubmitting(true);
     try {
-      const payload = {
-        ...data,
-        images: data.image_url ? [data.image_url] : undefined,
-      };
-      delete (payload as any).image_url;
+      const payload: Record<string, unknown> = { ...data };
+      removeEmptyOptionalFields(payload);
+
+      if (imageFile) {
+        payload.blob = await readFileAsDataUrl(imageFile);
+        payload.blob_mime_type = imageFile.type;
+        payload.blob_file_name = imageFile.name;
+      }
 
       const response = await propertyAPI.create(payload);
       toast.success("Property listed successfully!");
@@ -94,7 +116,7 @@ export default function NewPropertyPage() {
           className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4"
         >
           <Input
-            label="Title"
+            label="Title *"
             placeholder="e.g. Spacious 2BHK Apartment in Anna Nagar"
             {...register("title")}
             error={errors.title?.message}
@@ -114,9 +136,10 @@ export default function NewPropertyPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Price (₹)"
+              label="Price (₹) *"
               type="number"
               placeholder="5000000"
+              min={0}
               {...register("price")}
               error={errors.price?.message}
             />
@@ -141,6 +164,7 @@ export default function NewPropertyPage() {
               label="Bedrooms"
               type="number"
               placeholder="0"
+              min={0}
               {...register("bedrooms")}
               onWheel={preventNumberInputWheel}
               error={errors.bedrooms?.message}
@@ -149,21 +173,23 @@ export default function NewPropertyPage() {
               label="Bathrooms"
               type="number"
               placeholder="0"
+              min={0}
               {...register("bathrooms")}
               onWheel={preventNumberInputWheel}
               error={errors.bathrooms?.message}
             />
             <Input
-              label="Area (sqft)"
+              label="Area (sqft) *"
               type="number"
               placeholder="1200"
+              min={0}
               {...register("area_sqft")}
               error={errors.area_sqft?.message}
             />
           </div>
 
           <Input
-            label="City"
+            label="City *"
             placeholder="Chennai"
             {...register("city")}
             error={errors.city?.message}
@@ -178,12 +204,20 @@ export default function NewPropertyPage() {
             placeholder="123 Main Street"
             {...register("address")}
           />
-          <Input
-            label="Image URL (optional)"
-            placeholder="https://example.com/photo.jpg"
-            {...register("image_url")}
-            error={errors.image_url?.message}
-          />
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">
+              Property Image
+            </label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(event) =>
+                setImageFile(event.target.files?.[0] ?? null)
+              }
+              className="w-full border rounded-lg p-2 text-sm text-gray-900"
+            />
+          </div>
 
           <Button type="submit" loading={submitting} className="w-full mt-2">
             List Property

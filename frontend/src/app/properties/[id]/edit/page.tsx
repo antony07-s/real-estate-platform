@@ -11,8 +11,9 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { EditPropertyShimmer } from "@/components/ui/Skeletons";
 import toast from "react-hot-toast";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const propertySchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(255),
@@ -25,19 +26,32 @@ const propertySchema = z.object({
   city: z.string().min(1, "City is required"),
   locality: z.string().optional(),
   address: z.string().optional(),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type PropertyFormInput = z.input<typeof propertySchema>;
 type PropertyFormData = z.output<typeof propertySchema>;
 
-const preventNumberInputWheel = (
-  event: WheelEvent<HTMLInputElement>,
-) => {
-  event.currentTarget.blur();
+const preventNumberInputWheel = (e: WheelEvent<HTMLInputElement>) => {
+  e.currentTarget.blur();
+};
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+const removeEmptyOptionalFields = (payload: Record<string, unknown>) => {
+  ["description", "locality", "address"].forEach((field) => {
+    if (payload[field] === "") delete payload[field];
+  });
 };
 
 export default function EditPropertyPage() {
+  useDocumentTitle("Edit Property");
+
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -46,13 +60,10 @@ export default function EditPropertyPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [notOwner, setNotOwner] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [currentImageName, setCurrentImageName] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PropertyFormInput>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<PropertyFormInput>({
     resolver: zodResolver(propertySchema),
   });
 
@@ -74,6 +85,8 @@ export default function EditPropertyPage() {
         return;
       }
 
+      setCurrentImageName(property.blob_file_name || "");
+
       reset({
         title: property.title,
         description: property.description || "",
@@ -85,7 +98,6 @@ export default function EditPropertyPage() {
         city: property.city,
         locality: property.locality || "",
         address: property.address || "",
-        image_url: property.images?.[0] || "",
       });
     } catch (error) {
       toast.error("Property not found");
@@ -98,11 +110,14 @@ export default function EditPropertyPage() {
   const onSubmit = async (data: PropertyFormData) => {
     setSubmitting(true);
     try {
-      const payload = {
-        ...data,
-        images: data.image_url ? [data.image_url] : undefined,
-      };
-      delete (payload as any).image_url;
+      const payload: Record<string, unknown> = { ...data };
+      removeEmptyOptionalFields(payload);
+
+      if (imageFile) {
+        payload.blob = await readFileAsDataUrl(imageFile);
+        payload.blob_mime_type = imageFile.type;
+        payload.blob_file_name = imageFile.name;
+      }
 
       await propertyAPI.update(Number(id), payload);
       toast.success("Property updated successfully!");
@@ -118,7 +133,7 @@ export default function EditPropertyPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <LoadingSpinner size="lg" />
+         <EditPropertyShimmer />;
         <Footer />
       </div>
     );
@@ -129,9 +144,7 @@ export default function EditPropertyPage() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-red-500 font-medium">
-            You can only edit your own properties
-          </p>
+          <p className="text-red-500 font-medium">You can only edit your own properties</p>
         </div>
         <Footer />
       </div>
@@ -150,16 +163,10 @@ export default function EditPropertyPage() {
           onSubmit={handleSubmit(onSubmit as any)}
           className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4"
         >
-          <Input
-            label="Title"
-            {...register("title")}
-            error={errors.title?.message}
-          />
+          <Input label="Title *" {...register("title")} error={errors.title?.message} />
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Description
-            </label>
+            <label className="text-sm font-medium text-gray-700">Description</label>
             <textarea
               {...register("description")}
               rows={3}
@@ -168,20 +175,10 @@ export default function EditPropertyPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Price (₹)"
-              type="number"
-              {...register("price")}
-              error={errors.price?.message}
-            />
+            <Input label="Price (₹) *" type="number" min={0} {...register("price")} error={errors.price?.message} />
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                Property Type
-              </label>
-              <select
-                {...register("property_type")}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500"
-              >
+              <label className="text-sm font-medium text-gray-700">Property Type</label>
+              <select {...register("property_type")} className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500">
                 <option value="apartment">Apartment</option>
                 <option value="house">House</option>
                 <option value="villa">Villa</option>
@@ -191,41 +188,46 @@ export default function EditPropertyPage() {
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <Input
-              label="Bedrooms"
-              type="number"
-              {...register("bedrooms")}
-              onWheel={preventNumberInputWheel}
-              error={errors.bedrooms?.message}
-            />
-            <Input
-              label="Bathrooms"
-              type="number"
-              {...register("bathrooms")}
-              onWheel={preventNumberInputWheel}
-              error={errors.bathrooms?.message}
-            />
-            <Input
-              label="Area (sqft)"
-              type="number"
-              {...register("area_sqft")}
-              error={errors.area_sqft?.message}
-            />
+            <Input label="Bedrooms" type="number" min={0} {...register("bedrooms")} onWheel={preventNumberInputWheel} error={errors.bedrooms?.message} />
+            <Input label="Bathrooms" type="number" min={0} {...register("bathrooms")} onWheel={preventNumberInputWheel} error={errors.bathrooms?.message} />
+            <Input label="Area (sqft) *" type="number" min={0} {...register("area_sqft")} error={errors.area_sqft?.message} />
           </div>
 
-          <Input
-            label="City"
-            {...register("city")}
-            error={errors.city?.message}
-          />
+          <Input label="City *" {...register("city")} error={errors.city?.message} />
           <Input label="Locality" {...register("locality")} />
           <Input label="Address" {...register("address")} />
-          <Input
-            label="Image URL (optional)"
-            placeholder="https://example.com/photo.jpg"
-            {...register("image_url")}
-            error={errors.image_url?.message}
-          />
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Property Image</label>
+
+            {/* current image filename as text */}
+            {currentImageName && !imageFile && (
+              <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+                <span className="text-sm text-gray-600 flex-1 truncate">📎 {currentImageName}</span>
+              </div>
+            )}
+
+            {/* new file selected — show name with remove option */}
+            {imageFile && (
+              <div className="flex items-center gap-2 border border-blue-300 rounded-lg px-3 py-2 bg-blue-50">
+                <span className="text-sm text-gray-700 flex-1 truncate">📎 {imageFile.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setImageFile(null)}
+                  className="text-xs text-red-500 hover:underline flex-shrink-0"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+              className="w-full border rounded-lg p-2 text-sm text-gray-900"
+            />
+          </div>
 
           <Button type="submit" loading={submitting} className="w-full mt-2">
             Update Property

@@ -24,18 +24,20 @@ const InquiryForm = ({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async () => {
+    // inline validation — no toast
     if (!message.trim()) {
-      toast.error("Please enter a message");
+      setError("Message is required");
+      return;
+    }
+    if (message.trim().length < 10) {
+      setError("Message must be at least 10 characters");
       return;
     }
 
-    if (message.length < 10) {
-      toast.error("Message must be at least 10 characters");
-      return;
-    }
-
+    setError("");
     setLoading(true);
     try {
       await leadAPI.create({ property_id: propertyId, message });
@@ -51,7 +53,6 @@ const InquiryForm = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
-      {/* Owner Info */}
       <h3 className="text-lg font-bold text-gray-800 mb-1">Contact Owner</h3>
       <p className="text-gray-600 text-sm mb-4">{ownerName}</p>
 
@@ -74,17 +75,13 @@ const InquiryForm = ({
         <div className="text-center py-4 bg-gray-50 rounded-lg">
           <p className="text-gray-500 text-sm mb-3">Login to contact owner</p>
           <a href="/login">
-            <Button size="sm" className="w-full">
-              Login to Inquire
-            </Button>
+            <Button size="sm" className="w-full">Login to Inquire</Button>
           </a>
         </div>
       ) : sent ? (
         <div className="text-center py-4 bg-green-50 rounded-lg border border-green-200">
           <p className="text-green-600 font-medium">Inquiry Sent!</p>
-          <p className="text-green-500 text-sm mt-1">
-            Owner will contact you soon
-          </p>
+          <p className="text-green-500 text-sm mt-1">Owner will contact you soon</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -92,15 +89,29 @@ const InquiryForm = ({
             <MessageSquare size={16} className="text-blue-500" />
             Send Message
           </div>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Hi, I am interested in this property. Please contact me."
-            rows={4}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
-          />
+
+          <div className="flex flex-col gap-1">
+            <textarea
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                if (error) setError("") // clear error on type
+              }}
+              placeholder="Hi, I am interested in this property. Please contact me."
+              rows={4}
+              className={`border rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 resize-none transition ${error
+                ? "border-red-400 focus:border-red-400 focus:ring-red-200"
+                : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
+                }`}
+            />
+            {/* inline error below textarea */}
+            {error && (
+              <p className="text-xs text-red-500">{error}</p>
+            )}
+          </div>
+
           <Button onClick={handleSubmit} loading={loading} className="w-full">
-            Send Enquiry
+            Send Inquiry
           </Button>
         </div>
       )}
