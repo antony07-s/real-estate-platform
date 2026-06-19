@@ -147,7 +147,7 @@ export default function HomePage() {
               Browse Properties
             </Button>
           </Link>
-          <Link href="/register">
+          <Link href="/properties/new">
             <Button size="lg" variant="secondary" className="hover:bg-blue-50">
               List Your Property
             </Button>
