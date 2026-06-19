@@ -22,7 +22,7 @@ const decodeImageBlob = (blob) => {
   return Buffer.from(base64, "base64");
 };
 
-// ─── Create Property ────────────────────────────────
+// Create Property 
 const createProperty = async (userId, data) => {
   const {
     title, description, price, property_type,
@@ -50,7 +50,7 @@ const createProperty = async (userId, data) => {
   return serializeProperty(result.rows[0]);
 };
 
-// ─── Get All Properties (Search + Filter + Pagination) ──
+//  Get All Properties (Search + Filter + Pagination) 
 const getAllProperties = async (filters) => {
   const {
     city, min_price, max_price, property_type, bedrooms,
@@ -132,7 +132,7 @@ const getAllProperties = async (filters) => {
   };
 };
 
-// ─── Get Single Property ────────────────────────────
+//  Get Single Property 
 const getPropertyById = async (id) => {
   const result = await pool.query(
     `SELECT p.*, u.name as owner_name, u.phone as owner_phone, u.email as owner_email
@@ -148,11 +148,11 @@ const getPropertyById = async (id) => {
     throw error;
   }
 
-  // ✅ serialize so blob + blob_file_name are returned
+  // Serialize so blob + blob_file_name are returned
   return serializeProperty(result.rows[0]);
 };
 
-// ─── Update Property ────────────────────────────────
+//  Update Property 
 const updateProperty = async (id, userId, data) => {
   const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [id]);
 
@@ -209,7 +209,7 @@ const updateProperty = async (id, userId, data) => {
   return serializeProperty(result.rows[0]);
 };
 
-// ─── Delete Property ────────────────────────────────
+//  Delete Property 
 const deleteProperty = async (id, userId) => {
   const existing = await pool.query("SELECT * FROM properties WHERE id = $1", [id]);
 
@@ -229,7 +229,7 @@ const deleteProperty = async (id, userId) => {
   return { message: "Property deleted successfully" };
 };
 
-// ─── Similar Properties ─────────────────────────────
+//  Similar Properties 
 const getSimilarProperties = async (propertyId) => {
   const current = await pool.query("SELECT * FROM properties WHERE id = $1", [propertyId]);
   if (current.rows.length === 0) return [];
@@ -253,7 +253,7 @@ const getSimilarProperties = async (propertyId) => {
   return result.rows.map(serializeProperty);
 };
 
-// ─── Get City Suggestions (autocomplete) ────────────
+//  Get City Suggestions (autocomplete) 
 const getCitySuggestions = async (query) => {
   const result = await pool.query(
     `SELECT DISTINCT city FROM properties WHERE city ILIKE $1 ORDER BY city ASC LIMIT 8`,

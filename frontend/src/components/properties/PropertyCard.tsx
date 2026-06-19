@@ -84,7 +84,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           </div>
 
           {/* Features */}
-<div className="flex items-center gap-4 text-gray-600 text-sm border-t pt-3 mt-auto">
+          <div className="flex items-center gap-4 text-gray-600 text-sm border-t pt-3 mt-auto">
             {property.bedrooms !== undefined && property.bedrooms !== null && (
               <div className="flex items-center gap-1">
                 <Bed size={14} />

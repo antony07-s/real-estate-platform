@@ -1,7 +1,7 @@
 const leadService = require("./lead.service");
 const Joi = require("joi");
 
-// ─── Validation Schema ──────────────────────────────
+//  Validation Schema 
 const leadSchema = Joi.object({
   property_id: Joi.number().integer().required(),
   message: Joi.string().min(10).max(500).required(),
@@ -11,7 +11,7 @@ const statusSchema = Joi.object({
   status: Joi.string().valid("pending", "responded", "closed").required(),
 });
 
-// ─── Create Lead ────────────────────────────────────
+//  Create Lead 
 const createLead = async (req, res, next) => {
   try {
     const { error, value } = leadSchema.validate(req.body);
@@ -34,7 +34,7 @@ const createLead = async (req, res, next) => {
   }
 };
 
-// ─── Get Leads Received (as owner) ──────────────────
+//  Get Leads Received (as owner) 
 const getMyLeads = async (req, res, next) => {
   try {
     const leads = await leadService.getMyLeads(req.user.userId);
@@ -48,7 +48,7 @@ const getMyLeads = async (req, res, next) => {
   }
 };
 
-// ─── Get Leads Sent (as buyer) ──────────────────────
+//  Get Leads Sent (as buyer) 
 const getMySentLeads = async (req, res, next) => {
   try {
     const leads = await leadService.getMySentLeads(req.user.userId);
@@ -62,7 +62,7 @@ const getMySentLeads = async (req, res, next) => {
   }
 };
 
-// ─── Update Lead Status ─────────────────────────────
+//  Update Lead Status
 const updateLeadStatus = async (req, res, next) => {
   try {
     const { error, value } = statusSchema.validate(req.body);

@@ -1,6 +1,6 @@
 const pool = require("../../config/db");
 
-// ─── Create Lead ────────────────────────────────────
+// Create Lead 
 const createLead = async (senderId, data) => {
   const { property_id, message } = data;
 
@@ -26,7 +26,6 @@ const createLead = async (senderId, data) => {
 
   // 3. Check duplicate inquiry
   // UNIQUE(property_id, sender_id) in DB also prevents this
-  // but we check here for a better error message
   const existing = await pool.query(
     "SELECT id FROM leads WHERE property_id = $1 AND sender_id = $2",
     [property_id, senderId],
@@ -67,7 +66,7 @@ const createLead = async (senderId, data) => {
   return result.rows[0];
 };
 
-// ─── Get Leads for Property Owner ───────────────────
+//  Get Leads for Property Owner
 const getMyLeads = async (userId) => {
   const result = await pool.query(
     `SELECT 
@@ -89,7 +88,7 @@ const getMyLeads = async (userId) => {
   return result.rows;
 };
 
-// ─── Get Leads Sent by User ─────────────────────────
+//  Get Leads Sent by User 
 const getMySentLeads = async (userId) => {
   const result = await pool.query(
     `SELECT 
@@ -108,7 +107,7 @@ const getMySentLeads = async (userId) => {
   return result.rows;
 };
 
-// ─── Update Lead Status ─────────────────────────────
+//  Update Lead Status 
 const updateLeadStatus = async (leadId, ownerId, status) => {
   const existing = await pool.query("SELECT * FROM leads WHERE id = $1", [
     leadId,

@@ -15,7 +15,7 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-// ─── Security Middlewares ───────────────────────────
+//  Security Middlewares 
 // helmet: adds security headers (protects from common attacks)
 app.disable("x-powered-by");
 app.use(
@@ -38,7 +38,7 @@ app.use(
   }),
 );
 
-// ─── Rate Limiting ──────────────────────────────────
+//  Rate Limiting 
 // Prevents spam — max 100 requests per 15 minutes per IP
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -62,26 +62,26 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// ─── Body Parser ────────────────────────────────────
+//  Body Parser 
 // Allows Express to read JSON from request body
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// ─── Swagger Docs ───────────────────────────────────
+//  Swagger Docs 
 // API documentation available at /api-docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ─── Routes ─────────────────────────────────────────
+//  Routes 
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/leads", leadRoutes);
 
-// ─── Health Check ───────────────────────────────────
+//  Health Check 
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Server is running!" });
 });
 
-// ─── Error Handler ──────────────────────────────────
+//  Error Handler 
 // Must be LAST — catches all errors from all routes
 app.use(errorHandler);
 

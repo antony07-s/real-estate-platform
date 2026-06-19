@@ -1,7 +1,7 @@
 const propertyService = require("./property.service");
 const Joi = require("joi");
 
-// ─── Validation Schema ──────────────────────────────
+//  Validation Schema 
 const propertySchema = Joi.object({
   title: Joi.string().min(5).max(255).required(),
   description: Joi.string().allow("").optional(),
@@ -24,7 +24,7 @@ const propertySchema = Joi.object({
   blob_file_name: Joi.string().max(255).optional(),
 });
 
-// ─── Create Property ────────────────────────────────
+//  Create Property 
 const createProperty = async (req, res, next) => {
   try {
     const { error, value } = propertySchema.validate(req.body);
@@ -51,7 +51,7 @@ const createProperty = async (req, res, next) => {
   }
 };
 
-// ─── Get All Properties ─────────────────────────────
+//  Get All Properties 
 const getAllProperties = async (req, res, next) => {
   try {
     // All filters come from query params
@@ -80,7 +80,7 @@ const getAllProperties = async (req, res, next) => {
   }
 };
 
-// ─── Get Single Property ────────────────────────────
+//  Get Single Property 
 const getPropertyById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -101,7 +101,7 @@ const getPropertyById = async (req, res, next) => {
   }
 };
 
-// ─── Update Property ────────────────────────────────
+//  Update Property 
 const updateProperty = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -121,7 +121,7 @@ const updateProperty = async (req, res, next) => {
   }
 };
 
-// ─── Delete Property ────────────────────────────────
+//  Delete Property 
 const deleteProperty = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -136,7 +136,7 @@ const deleteProperty = async (req, res, next) => {
   }
 };
 
-// ─── Get Similar Properties ─────────────────────────
+//  Get Similar Properties 
 const getSimilarProperties = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -151,7 +151,7 @@ const getSimilarProperties = async (req, res, next) => {
   }
 };
 
-// ─── Get City Suggestions ───────────────────────────
+//  Get City Suggestions 
 const getCitySuggestions = async (req, res, next) => {
   try {
     const { q } = req.query

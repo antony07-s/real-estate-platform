@@ -116,53 +116,53 @@ export const PropertyDetailShimmer = () => (
 )
 
 const SkField = () => (
-  <div className="flex flex-col gap-1">
-    <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
-    <div className="h-9 bg-gray-200 rounded-lg animate-pulse" />
-  </div>
+    <div className="flex flex-col gap-1">
+        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+        <div className="h-9 bg-gray-200 rounded-lg animate-pulse" />
+    </div>
 );
 
 // Edit Property Shimmer
 export const EditPropertyShimmer = () => {
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <div className="h-16 bg-white shadow-sm" />
-      <div className="max-w-2xl mx-auto px-3 py-6 sm:px-4 sm:py-10 flex-1 w-full">
-        <div className="h-7 w-40 max-w-full bg-gray-200 rounded animate-pulse mb-2" />
-        <div className="h-4 w-52 max-w-full bg-gray-100 rounded animate-pulse mb-6" />
+    return (
+        <div className="min-h-screen flex flex-col bg-gray-50">
+            <div className="h-16 bg-white shadow-sm" />
+            <div className="max-w-2xl mx-auto px-3 py-6 sm:px-4 sm:py-10 flex-1 w-full">
+                <div className="h-7 w-40 max-w-full bg-gray-200 rounded animate-pulse mb-2" />
+                <div className="h-4 w-52 max-w-full bg-gray-100 rounded animate-pulse mb-6" />
 
-        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 flex flex-col gap-5">
-          <SkField />
+                <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 flex flex-col gap-5">
+                    <SkField />
 
-          {/* Description textarea */}
-          <div className="flex flex-col gap-1">
-            <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
-            <div className="h-[72px] bg-gray-200 rounded-lg animate-pulse" />
-          </div>
+                    {/* Description textarea */}
+                    <div className="flex flex-col gap-1">
+                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-[72px] bg-gray-200 rounded-lg animate-pulse" />
+                    </div>
 
-          {/* Price + Type */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <SkField /><SkField />
-          </div>
+                    {/* Price + Type */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <SkField /><SkField />
+                    </div>
 
-          {/* Bedrooms / Bathrooms / Area */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <SkField /><SkField /><SkField />
-          </div>
+                    {/* Bedrooms / Bathrooms / Area */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <SkField /><SkField /><SkField />
+                    </div>
 
-          {/* City / Locality / Address */}
-          <SkField /><SkField /><SkField />
+                    {/* City / Locality / Address */}
+                    <SkField /><SkField /><SkField />
 
-          {/* Image */}
-          <div className="flex flex-col gap-1">
-            <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
-            <div className="h-10 bg-gray-200 rounded-lg animate-pulse" />
-          </div>
+                    {/* Image */}
+                    <div className="flex flex-col gap-1">
+                        <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-10 bg-gray-200 rounded-lg animate-pulse" />
+                    </div>
 
-          {/* Button */}
-          <div className="h-10 bg-gray-200 rounded-lg animate-pulse mt-2" />
+                    {/* Button */}
+                    <div className="h-10 bg-gray-200 rounded-lg animate-pulse mt-2" />
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };

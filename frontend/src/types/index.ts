@@ -1,4 +1,4 @@
-// ─── User ───────────────────────────────────────────
+//  User 
 export interface User {
   id: number;
   name: string;
@@ -7,7 +7,7 @@ export interface User {
   created_at: string;
 }
 
-// ─── Property ───────────────────────────────────────
+//  Property 
 export interface Property {
   id: number;
   user_id: number;
@@ -35,7 +35,7 @@ export interface Property {
   owner_email?: string;
 }
 
-// ─── Lead ───────────────────────────────────────────
+//  Lead 
 export interface Lead {
   id: number;
   property_id: number;
@@ -52,7 +52,7 @@ export interface Lead {
   sender_phone?: string;
 }
 
-// ─── API Response ────────────────────────────────────
+//  API Response 
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -60,7 +60,7 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// ─── Pagination ──────────────────────────────────────
+//  Pagination 
 export interface Pagination {
   total: number;
   totalPages: number;
@@ -68,7 +68,7 @@ export interface Pagination {
   limit: number;
 }
 
-// ─── Property Filters ────────────────────────────────
+//  Property Filters 
 export interface PropertyFilters {
   city?: string;
   min_price?: number;

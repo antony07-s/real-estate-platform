@@ -8,7 +8,7 @@ import { MapPin, Bed, Bath, Square, Calendar } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Home } from "lucide-react";
 import { API_BASE_URL, SITE_URL } from "@/lib/config";
-// ─── Fetch property data on the SERVER ──────────────
+// Fetch property data on the SERVER 
 async function getProperty(id: string) {
   try {
     const res = await fetch(`${API_BASE_URL}/properties/${id}`, {
@@ -42,7 +42,7 @@ const getSeoDescription = (property: Property) => {
     .slice(0, 160);
 };
 
-// ─── Dynamic SEO Metadata ────────────────────────────
+// Dynamic SEO Metadata 
 export async function generateMetadata({
   params,
 }: {

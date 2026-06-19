@@ -1,7 +1,7 @@
 const authService = require("./auth.service");
 const Joi = require("joi");
 
-// ─── Validation Schemas ─────────────────────────────
+//  Validation Schemas 
 // Joi validates incoming data before it reaches service
 const registerSchema = Joi.object({
   name: Joi.string().min(2).max(50).required(),
@@ -15,7 +15,7 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-// ─── Register ───────────────────────────────────────
+//  Register 
 const register = async (req, res, next) => {
   try {
     // 1. Validate request body
@@ -45,7 +45,7 @@ const register = async (req, res, next) => {
   }
 };
 
-// ─── Login ──────────────────────────────────────────
+// Login 
 const login = async (req, res, next) => {
   try {
     // 1. Validate request body
@@ -75,7 +75,7 @@ const login = async (req, res, next) => {
   }
 };
 
-// ─── Refresh Token ──────────────────────────────────
+// Refresh Token 
 const refreshToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
@@ -98,7 +98,7 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
-// ─── Get Current User ───────────────────────────────
+// Get Current User
 const getMe = async (req, res, next) => {
   try {
     // req.user is set by auth middleware

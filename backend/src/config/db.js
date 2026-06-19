@@ -2,8 +2,6 @@ const { Pool } = require("pg");
 require("dotenv").config();
 
 // Pool = a collection of database connections
-// Instead of opening/closing connection every time,
-// Pool keeps connections ready — much faster!
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,

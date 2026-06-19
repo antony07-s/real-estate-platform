@@ -16,7 +16,7 @@ const requireSecret = (name) => {
 const JWT_SECRET = requireSecret("JWT_SECRET");
 const JWT_REFRESH_SECRET = requireSecret("JWT_REFRESH_SECRET");
 
-// ─── Helper: Generate Tokens ────────────────────────
+//  Helper: Generate Tokens 
 const generateTokens = (userId, email) => {
   // Access token — short lived (15 mins)
   const accessToken = jwt.sign({ userId, email }, JWT_SECRET, {
@@ -34,7 +34,7 @@ const generateTokens = (userId, email) => {
   return { accessToken, refreshToken };
 };
 
-// ─── Register ───────────────────────────────────────
+// Register 
 const register = async ({ name, email, password, phone }) => {
   // 1. Check if email already exists
   const existingUser = await pool.query(
@@ -49,7 +49,6 @@ const register = async ({ name, email, password, phone }) => {
   }
 
   // 2. Hash password — never store plain text!
-  // 10 = salt rounds (higher = more secure but slower)
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // 3. Insert user into database
@@ -68,7 +67,7 @@ const register = async ({ name, email, password, phone }) => {
   return { user, ...tokens };
 };
 
-// ─── Login ──────────────────────────────────────────
+//  Login 
 const login = async ({ email, password }) => {
   // 1. Find user by email
   const result = await pool.query("SELECT * FROM users WHERE email = $1", [
@@ -101,7 +100,7 @@ const login = async ({ email, password }) => {
   return { user: userWithoutPassword, ...tokens };
 };
 
-// ─── Refresh Token ──────────────────────────────────
+//  Refresh Token 
 const refreshToken = async (token) => {
   try {
     // Verify refresh token

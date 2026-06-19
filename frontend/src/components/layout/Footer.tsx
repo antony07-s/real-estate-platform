@@ -90,7 +90,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-500">
-          © 2026 RealEstate Platform. All rights reserved.
+          © {new Date().getFullYear()} RealEstate Platform. All rights reserved.
         </div>
       </div>
     </footer>

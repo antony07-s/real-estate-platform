@@ -11,7 +11,7 @@ const authenticate = (req, res, next) => {
     }
 
     // Get token from header
-    // Header format: "Authorization: Bearer <token>"
+    // Header format: "Authorization: Bearer <token>
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -43,7 +43,7 @@ const authenticate = (req, res, next) => {
 
     next(); // move to next middleware/controller
   } catch (err) {
-    next(err); // sends to errorHandler
+    next(err);
   }
 };
 
