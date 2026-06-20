@@ -1,18 +1,27 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { Suspense, useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import PropertyFilters from '@/components/properties/PropertyFilters'
 import PropertyGrid from '@/components/properties/PropertyGrid'
 import Button from '@/components/ui/Button'
+import { PropertiesShimmer } from '@/components/ui/Skeletons'
 import { propertyAPI } from '@/lib/api'
 import { Property, PropertyFilters as Filters, Pagination } from '@/types'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import useDocumentTitle from '@/hooks/useDocumentTitle'
 
 export default function PropertiesPage() {
+  return (
+    <Suspense fallback={<PropertiesShimmer />}>
+      <PropertiesContent />
+    </Suspense>
+  )
+}
+
+function PropertiesContent() {
   useDocumentTitle('Find Properties')
 
   const searchParams = useSearchParams()
